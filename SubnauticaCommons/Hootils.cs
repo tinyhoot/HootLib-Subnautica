@@ -1,7 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using Nautilus.Assets;
+using Nautilus.Utility;
 using UnityEngine;
 
 namespace SubnauticaCommons
@@ -9,8 +13,29 @@ namespace SubnauticaCommons
     /// <summary>
     /// A collection of useful things that didn't fit anywhere else, or that are just very general Unity things.
     /// </summary>
-    public static class Utils
+    public static class Hootils
     {
+        /// <summary>
+        /// Get the mod assembly.
+        /// </summary>
+        public static Assembly GetAssembly()
+        {
+            return Assembly.GetExecutingAssembly();
+        }
+
+        /// <summary>
+        /// Get the full path to an asset file.
+        /// </summary>
+        /// <param name="fileName">The name of the file, assuming that it is directly inside the Assets folder.</param>
+        /// <param name="isEmbedded">Whether the file is shipped separately or embedded into the assembly as a
+        /// resource.</param>
+        public static string GetAssetHandle(string fileName, bool isEmbedded = false)
+        {
+            if (isEmbedded)
+                return $"{GetAssembly().GetName().Name}.Assets.{fileName}";
+            return Path.Combine(GetModDirectory(), "Assets", fileName);
+        }
+        
         /// <summary>
         /// Get the ideal filename for the config file based on the name of the mod.
         /// </summary>
@@ -44,7 +69,20 @@ namespace SubnauticaCommons
             return result;
         }
         
-        // Textures and colouring
+        // Prefabs
+
+        /// <summary>
+        /// Create a basic Nautilus prefabinfo with a sprite. Defaults to not unlocked at start.
+        /// </summary>
+        public static PrefabInfo CreatePrefabInfo(string classId, string displayName, string description,
+            Atlas.Sprite sprite)
+        {
+            return PrefabInfo
+                .WithTechType(classId, displayName, description, unlockAtStart: false, techTypeOwner: GetAssembly())
+                .WithIcon(sprite);
+        }
+        
+        // Sprites, textures, and colouring
         
         /// <summary>
         /// Add a color tag to the given text.
@@ -86,6 +124,48 @@ namespace SubnauticaCommons
 
             return clonedTexture;
             // "clonedTexture" now has the same pixels from "texture" and it's readable.
+        }
+
+        /// <summary>
+        /// Get an already loaded sprite from the game by its TechType.
+        /// </summary>
+        public static Atlas.Sprite GetSprite(TechType techType)
+        {
+            return SpriteManager.Get(techType);
+        }
+
+        /// <summary>
+        /// Load a sprite from the assets folder by its filename.
+        /// </summary>
+        /// <param name="fileName">The name of the file, assuming that it is directly inside the Assets folder.</param>
+        /// <param name="isEmbedded">Whether the file is shipped separately or embedded into the assembly as a
+        /// resource.</param>
+        public static Atlas.Sprite LoadSprite(string fileName, bool isEmbedded = false)
+        {
+            if (!isEmbedded)
+                return ImageUtils.LoadSpriteFromFile(GetAssetHandle(fileName));
+            
+            // Embedded files are a bit more difficult to deal with. Load them into memory first, then pass them
+            // to the texture handlers.
+            string resourceName = GetAssetHandle(fileName, true);
+            if (!GetAssembly().GetManifestResourceNames().Any(r => r.Equals(resourceName)))
+                throw new FileNotFoundException($"Could not find embedded resource {resourceName}");
+            
+            // Things can still go wrong while reading the texture (although it shouldn't!). Catch exceptions
+            // just in case so the mod as a whole won't crash.
+            var stream = GetAssembly().GetManifestResourceStream(resourceName);
+            try
+            {
+                var texture = new Texture2D(2, 2, TextureFormat.BC7, false);
+                texture.LoadImage(stream.ReadAllBytes());
+                return ImageUtils.LoadSpriteFromTexture(texture);
+            }
+            catch (UnityException ex)
+            {
+                // We don't have access to any mod's logger here, so use Unity's instead.
+                new Logger().LogException(ex);
+                return null;
+            }
         }
         
         /// <summary>
@@ -140,6 +220,29 @@ namespace SubnauticaCommons
                 // Yield statements cannot be inside try-catch blocks. This is what made the whole method necessary.
                 yield return current;
             }
+        }
+    }
+
+    public static class StreamExtensions
+    {
+        /// <summary>
+        /// Read a stream to the end and return the entire content all at once.
+        /// </summary>
+        public static byte[] ReadAllBytes(this Stream stream)
+        {
+            List<byte> bytes = new List<byte>();
+            byte[] buffer = new byte[1024];
+
+            long bytesToRead = stream.Length;
+            while (bytes.Count < bytesToRead)
+            {
+                int numRead = stream.Read(buffer, 0, buffer.Length);
+                if (numRead <= 0)
+                    break;
+                bytes.AddRange(buffer);
+            }
+
+            return bytes.ToArray();
         }
     }
 }

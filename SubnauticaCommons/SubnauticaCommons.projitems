@@ -16,6 +16,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)HootLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ILogHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ConfigEntryException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hootils.cs" />
   </ItemGroup>
 </Project>

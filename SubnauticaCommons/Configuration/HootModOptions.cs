@@ -113,7 +113,7 @@ namespace SubnauticaCommons.Configuration
             background.transform.localScale = new Vector3(targetWidth / background.GetComponent<RectTransform>().rect.width, 0.4f, 1f);
             
             // Change the colour of the nabbed sprite.
-            image.sprite = Utils.RecolorSprite(sprite, new Color(0.4f, 0.7f, 0.9f));
+            image.sprite = Hootils.RecolorSprite(sprite, new Color(0.4f, 0.7f, 0.9f));
 
             _separator = separator;
             return separator;
