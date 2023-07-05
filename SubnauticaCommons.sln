@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubnauticaCommons", "SubnauticaCommons\SubnauticaCommons.csproj", "{D3B5597C-3E59-4503-9026-17D34E5F2AA3}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SubnauticaCommons", "SubnauticaCommons\SubnauticaCommons.shproj", "{A1EF0757-EDA8-41DC-89D4-C41D81427D00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

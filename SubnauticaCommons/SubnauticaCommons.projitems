@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>395490FA-CEBF-442E-B10D-422E73A6D416</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SubnauticaCommons</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Configuration\ConfigEntryWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configuration\ConfigEntryWrapperBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootModOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HootLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ILogHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ConfigEntryException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
+  </ItemGroup>
+</Project>
