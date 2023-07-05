@@ -18,8 +18,4 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ConfigEntryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)LICENCE" />
-    <Content Include="$(MSBuildThisFileDirectory)README.md" />
-  </ItemGroup>
 </Project>
