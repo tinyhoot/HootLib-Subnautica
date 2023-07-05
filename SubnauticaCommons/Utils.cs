@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 
 namespace SubnauticaCommons
@@ -9,6 +11,22 @@ namespace SubnauticaCommons
     /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Get the ideal filename for the config file based on the name of the mod.
+        /// </summary>
+        public static string GetConfigFileName(string modName)
+        {
+            return $"{modName.Replace(" ", string.Empty)}.cfg";
+        }
+        
+        /// <summary>
+        /// Get the installation directory of the mod.
+        /// </summary>
+        public static string GetModDirectory()
+        {
+            return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName;
+        }
+        
         // Enums
         
         /// <summary>

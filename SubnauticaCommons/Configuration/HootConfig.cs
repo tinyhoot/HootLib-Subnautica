@@ -4,6 +4,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using SubnauticaCommons.Objects.Exceptions;
+using UnityEngine;
 
 namespace SubnauticaCommons.Configuration
 {
@@ -49,6 +50,14 @@ namespace SubnauticaCommons.Configuration
         /// Delayed to its own method to ensure all options exist in the <see cref="ConfigFile"/> first.
         /// </summary>
         protected abstract void RegisterControllingOptions();
+
+        /// <summary>
+        /// Set up your <see cref="HootModOptions"/> here. Do not forget to call this method after constructing
+        /// a new config instance.
+        /// </summary>
+        /// <param name="name">The mod name displayed as a heading.</param>
+        /// <param name="separatorParent">The persistent GameObject to parent the primary separator object to.</param>
+        public abstract void RegisterModOptions(string name, Transform separatorParent);
 
         /// <summary>
         /// Register a config entry to the config. This should be used during <see cref="RegisterOptions"/>.
