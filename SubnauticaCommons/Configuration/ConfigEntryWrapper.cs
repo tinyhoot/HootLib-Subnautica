@@ -14,6 +14,7 @@ namespace SubnauticaCommons.Configuration
     public class ConfigEntryWrapper<T> : ConfigEntryWrapperBase
     {
         public Dictionary<T, HashSet<string>> ControllingValues;
+        public string[] OptionStringsOverride;
         public readonly ConfigEntry<T> Entry;
         public T Value => Entry.Value;
 
@@ -105,6 +106,21 @@ namespace SubnauticaCommons.Configuration
         }
 
         /// <summary>
+        /// For ChoiceOptions using enums only. Instead of showing the enum's values, overrides the displayed text
+        /// of the choices with the contents of the given array. The array <em>must</em> contain the same number
+        /// of elements as the enum!
+        /// </summary>
+        /// <param name="newText">The text to show for each enum value, in the same order.</param>
+        public ConfigEntryWrapper<T> WithChoiceOptionStringsOverride(string[] newText)
+        {
+            if (newText.Length != Enum.GetValues(typeof(T)).Length)
+                throw new ArgumentException("New choices array must be the same length as the number of number of choices!");
+
+            OptionStringsOverride = newText;
+            return this;
+        }
+
+        /// <summary>
         /// Prepare the entry as a controller for displaying or hiding other options in the mod options menu.
         /// This enables showing options with preconditions, such as hiding all options of a module when that module
         /// is not active.
@@ -167,6 +183,8 @@ namespace SubnauticaCommons.Configuration
                 wrapper.Entry.Value = e.Value;
                 wrapper.UpdateControlledOptions(modOptions.Options, modOptions.Config);
             };
+            if (wrapper.OptionStringsOverride != null)
+                modOption.ReplaceOptionStrings(wrapper.OptionStringsOverride);
             return modOption;
         }
 
@@ -190,6 +208,8 @@ namespace SubnauticaCommons.Configuration
                 wrapper.Entry.Value = e.Value;
                 wrapper.UpdateControlledOptions(modOptions.Options, modOptions.Config);
             };
+            if (wrapper.OptionStringsOverride != null)
+                modOption.ReplaceOptionStrings(wrapper.OptionStringsOverride);
             return modOption;
         }
 
