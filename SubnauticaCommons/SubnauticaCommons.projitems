@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\ConfigEntryWrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\ConfigEntryWrapperBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configuration\ModOptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootModOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HootLogger.cs" />

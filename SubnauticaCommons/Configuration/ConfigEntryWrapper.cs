@@ -172,7 +172,7 @@ namespace SubnauticaCommons.Configuration
 
         /// <inheritdoc cref="ToModToggleOption"/>
         public static ModChoiceOption<TEnum> ToModChoiceOption<TEnum>(this ConfigEntryWrapper<TEnum> wrapper,
-            HootModOptions modOptions, IEnumerable<TEnum> values) where TEnum : Enum
+            HootModOptions modOptions, IEnumerable<TEnum> values = null) where TEnum : Enum
         {
             TEnum[] options = values?.ToArray() ?? (TEnum[])Enum.GetValues(typeof(TEnum));
             if (options == null)
