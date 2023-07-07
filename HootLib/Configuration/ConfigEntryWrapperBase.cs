@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Nautilus.Options;
 
-namespace SubnauticaCommons.Configuration
+namespace HootLib.Configuration
 {
     /// <summary>
     /// The base class of a config entry, without the entry and its typing attached.

@@ -6,7 +6,7 @@
     <SharedGUID>395490FA-CEBF-442E-B10D-422E73A6D416</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>SubnauticaCommons</Import_RootNamespace>
+    <Import_RootNamespace>HootLib</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\ConfigEntryWrapper.cs" />

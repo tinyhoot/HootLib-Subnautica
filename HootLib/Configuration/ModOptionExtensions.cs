@@ -2,7 +2,7 @@ using System;
 using HarmonyLib;
 using Nautilus.Options;
 
-namespace SubnauticaCommons.Configuration
+namespace HootLib.Configuration
 {
     public static class ModOptionExtensions
     {

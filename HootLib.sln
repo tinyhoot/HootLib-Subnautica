@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SubnauticaCommons", "SubnauticaCommons\SubnauticaCommons.shproj", "{A1EF0757-EDA8-41DC-89D4-C41D81427D00}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HootLib", "HootLib\HootLib.shproj", "{A1EF0757-EDA8-41DC-89D4-C41D81427D00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

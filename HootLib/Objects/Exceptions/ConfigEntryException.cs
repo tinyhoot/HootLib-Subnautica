@@ -1,6 +1,6 @@
 using System;
 
-namespace SubnauticaCommons.Objects.Exceptions
+namespace HootLib.Objects.Exceptions
 {
     public class ConfigEntryException : Exception
     {

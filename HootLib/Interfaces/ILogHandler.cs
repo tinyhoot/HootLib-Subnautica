@@ -1,4 +1,4 @@
-namespace SubnauticaCommons.Interfaces
+namespace HootLib.Interfaces
 {
     internal interface ILogHandler
     {

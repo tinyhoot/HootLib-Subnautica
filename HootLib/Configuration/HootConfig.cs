@@ -3,10 +3,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
-using SubnauticaCommons.Objects.Exceptions;
+using HootLib.Objects.Exceptions;
 using UnityEngine;
 
-namespace SubnauticaCommons.Configuration
+namespace HootLib.Configuration
 {
     /// <summary>
     /// Holds all configurable parameters and handles the config file itself.

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using BepInEx.Logging;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using ILogHandler = SubnauticaCommons.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 using Logger = BepInEx.Logging.Logger;
 
-namespace SubnauticaCommons
+namespace HootLib
 {
-    public class HootLogger : ILogHandler
+    public class HootLogger : Interfaces.ILogHandler
     {
         private readonly ManualLogSource _log;
         private readonly List<string> _ingameMessages;

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SubnauticaCommons.Configuration
+namespace HootLib.Configuration
 {
     /// <summary>
     /// Handles how the mod presents itself in the in-game menu.

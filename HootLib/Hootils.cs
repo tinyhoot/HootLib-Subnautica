@@ -8,7 +8,7 @@ using Nautilus.Assets;
 using Nautilus.Utility;
 using UnityEngine;
 
-namespace SubnauticaCommons
+namespace HootLib
 {
     /// <summary>
     /// A collection of useful things that didn't fit anywhere else, or that are just very general Unity things.

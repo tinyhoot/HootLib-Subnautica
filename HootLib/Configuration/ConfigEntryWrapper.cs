@@ -5,7 +5,7 @@ using System.Linq;
 using BepInEx.Configuration;
 using Nautilus.Options;
 
-namespace SubnauticaCommons.Configuration
+namespace HootLib.Configuration
 {
     /// <summary>
     /// A wrapper around the BepInEx ConfigEntry which provides extra fields for more fine-grained control over
@@ -146,8 +146,8 @@ namespace SubnauticaCommons.Configuration
             return this;
         }
 
-        /// <summary><inheritdoc cref="WithConditionalOptions(T,SubnauticaCommons.Configuration.ConfigEntryWrapperBase[])"/></summary>
-        /// <param name="enabledValue"><inheritdoc cref="WithConditionalOptions(T,SubnauticaCommons.Configuration.ConfigEntryWrapperBase[])"/></param>
+        /// <summary><inheritdoc cref="WithConditionalOptions(T,ConfigEntryWrapperBase[])"/></summary>
+        /// <param name="enabledValue"><inheritdoc cref="WithConditionalOptions(T,ConfigEntryWrapperBase[])"/></param>
         /// <param name="section">This option will have control over this entire section.</param>
         /// <param name="config">The config containing this option.</param>
         public ConfigEntryWrapper<T> WithConditionalOptions(T enabledValue, string section, HootConfig config)
