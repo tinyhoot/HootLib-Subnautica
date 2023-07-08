@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DeathrunRemade;
+using HarmonyLib;
 using Nautilus.Assets;
 using Nautilus.Utility;
 using UnityEngine;
@@ -219,6 +221,40 @@ namespace HootLib
                 }
                 // Yield statements cannot be inside try-catch blocks. This is what made the whole method necessary.
                 yield return current;
+            }
+        }
+    }
+    
+    public static class BasicTextExtensions
+    {
+        /// <summary>
+        /// Grab the component responsible for fading out the text.
+        /// </summary>
+        public static uGUI_TextFade GetTextFade(this BasicText basicText)
+        {
+            try
+            {
+                var field = AccessTools.Property(typeof(BasicText), "TextFade");
+                return field?.GetValue(basicText) as uGUI_TextFade;
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Nautilus does not want us to have this, so we just take it anyway. GameObject the text is attached to.
+        /// </summary>
+        public static GameObject GetTextObject(this BasicText basicText)
+        {
+            try
+            {
+                var field = AccessTools.Property(typeof(BasicText), "TextObject");
+                return field?.GetValue(basicText) as GameObject;
+            } catch (NullReferenceException)
+            {
+                return null;
             }
         }
     }
