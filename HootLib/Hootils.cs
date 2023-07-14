@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DeathrunRemade;
 using HarmonyLib;
 using Nautilus.Assets;
 using Nautilus.Utility;
@@ -23,6 +22,26 @@ namespace HootLib
         public static Assembly GetAssembly()
         {
             return Assembly.GetExecutingAssembly();
+        }
+
+        /// <summary>
+        /// Get all classes subclassing the Type parameter in the given assembly.
+        /// </summary>
+        public static List<Type> GetSubclassesInAssembly<T>(Assembly assembly)
+        {
+            return assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(T))).ToList();
+        }
+        
+        /// <summary>
+        /// Get all classes subclassing the Type parameter in the given assembly. Instead of just the types,
+        /// instantiate them immediately and return a list of objects.<br />
+        /// Only works for objects with parameterless constructors.
+        /// </summary>
+        public static List<T> InstantiateSubclassesInAssembly<T>(Assembly assembly)
+        {
+            return assembly.GetTypes()
+                .Where(type => type.IsSubclassOf(typeof(T)))
+                .Select(type => (T)Activator.CreateInstance(type)).ToList();
         }
 
         /// <summary>

@@ -16,6 +16,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootModOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HootLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ILogHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\HootHudBar.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\DangerPulse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ConfigEntryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Hootils.cs" />
   </ItemGroup>
