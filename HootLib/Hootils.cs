@@ -80,14 +80,16 @@ namespace HootLib
         /// </summary>
         /// <param name="value">The string to parse.</param>
         /// <returns>The parsed Enum if successful, or the Enum's default value if not.</returns>
-        public static TEnum ParseEnum<TEnum>(string value) where TEnum : struct
+        public static TEnum ParseEnum<TEnum>(this string value) where TEnum : Enum
         {
-            if (!Enum.TryParse(value, true, out TEnum result))
+            try
+            {
+                return (TEnum)Enum.Parse(typeof(TEnum), value, true);
+            }
+            catch
             {
                 return default;
             }
-
-            return result;
         }
         
         // Prefabs
@@ -145,14 +147,6 @@ namespace HootLib
 
             return clonedTexture;
             // "clonedTexture" now has the same pixels from "texture" and it's readable.
-        }
-
-        /// <summary>
-        /// Get an already loaded sprite from the game by its TechType.
-        /// </summary>
-        public static Atlas.Sprite GetSprite(TechType techType)
-        {
-            return SpriteManager.Get(techType);
         }
 
         /// <summary>
