@@ -20,5 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DangerPulse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ConfigEntryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Hootils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\Hootimer.cs" />
   </ItemGroup>
 </Project>
