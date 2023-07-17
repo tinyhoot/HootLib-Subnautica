@@ -37,12 +37,12 @@
     </Target>
 
     <!-- Automatically create the zip file, ready for distribution. -->
-    <Target Name="PrepareZip" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Target Name="PrepareZip" AfterTargets="Build" Condition="$(Configuration.Contains('Release'))">
         <Message Importance="normal" Text="Copying files to temporary directory." />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TempZipDir)\$(ZipStructure)" />
         <Copy SourceFiles="@(Assets)" DestinationFolder="$(TempZipDir)\$(ZipStructure)\%(Assets.RelativeDir)" />
     </Target>
-    <Target Name="CreateZip" AfterTargets="PrepareZip" Condition="'$(Configuration)' == 'Release'">
+    <Target Name="CreateZip" AfterTargets="PrepareZip" Condition="$(Configuration.Contains('Release'))">
         <Message Importance="high" Text="Zipping project for distribution." />
         <ZipDirectory DestinationFile="$(OutputPath)$(AssemblyName).zip" SourceDirectory="$(TempZipDir)" Overwrite="true" />
     </Target>
@@ -50,7 +50,7 @@
         <Message Importance="normal" Text="Cleaning up." />
         <RemoveDir Directories="$(TempZipDir)" />
     </Target>
-    <Target Name="CopyToZipsFolder" AfterTargets="Cleanup" Condition="'$(Configuration)' == 'Release' And '$(ReleaseZipDirectory)' != ''">
+    <Target Name="CopyToZipsFolder" AfterTargets="Cleanup" Condition="$(Configuration.Contains('Release')) And '$(ReleaseZipDirectory)' != ''">
         <Message Importance="normal" Text="Moving finished zip file to zip directory." />
         <Copy SourceFiles="$(OutputPath)$(AssemblyName).zip" DestinationFolder="$(ReleaseZipDirectory)" />
     </Target>
