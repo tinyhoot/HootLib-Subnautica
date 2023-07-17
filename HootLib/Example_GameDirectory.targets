@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <!-- Note: Do not commit this file into version control (git). The whole point of having this file separate is so that you can -->
+    <!-- have your IDE do all this extra work *without* broadcasting the contents of your filesystem to the entire world. -->
+    <PropertyGroup>
+        <GameDirectory>C:\Program Files\Steam\steamapps\common\Subnautica</GameDirectory>
+        <!-- Optionally, you can also define a more convenient release folder for all your zip files to get stored in. -->
+        <!-- <ReleaseZipDirectory>$(SolutionDir)\Releases</ReleaseZipDirectory> -->
+    </PropertyGroup>
+</Project>

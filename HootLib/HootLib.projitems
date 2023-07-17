@@ -22,4 +22,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Hootils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Hootimer.cs" />
   </ItemGroup>
+  <Import Project="$(MSBuildThisFileDirectory)PostBuildEvents.targets" />
 </Project>
