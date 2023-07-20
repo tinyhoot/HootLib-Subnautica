@@ -23,7 +23,7 @@ namespace HootLib
         {
             return Assembly.GetExecutingAssembly();
         }
-
+        
         /// <summary>
         /// Get all classes subclassing the Type parameter in the given assembly.
         /// </summary>
@@ -73,7 +73,7 @@ namespace HootLib
             return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName;
         }
         
-        // Enums
+        #region Enums
         
         /// <summary>
         /// Try parsing a string to the given type of Enum.
@@ -91,8 +91,9 @@ namespace HootLib
                 return default;
             }
         }
+        #endregion Enums
         
-        // Prefabs
+        #region Prefabs
 
         /// <summary>
         /// Create a basic Nautilus prefabinfo with a sprite. Defaults to not unlocked at start.
@@ -104,8 +105,9 @@ namespace HootLib
                 .WithTechType(classId, displayName, description, unlockAtStart: false, techTypeOwner: GetAssembly())
                 .WithIcon(sprite);
         }
+        #endregion Prefabs
         
-        // Sprites, textures, and colouring
+        #region Sprites and Textures
         
         /// <summary>
         /// Add a color tag to the given text.
@@ -236,6 +238,7 @@ namespace HootLib
                 yield return current;
             }
         }
+        #endregion Sprites and Textures
     }
     
     public static class BasicTextExtensions

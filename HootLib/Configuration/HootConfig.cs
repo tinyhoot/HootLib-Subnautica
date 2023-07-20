@@ -52,12 +52,13 @@ namespace HootLib.Configuration
         protected abstract void RegisterControllingOptions();
 
         /// <summary>
-        /// Set up your <see cref="HootModOptions"/> here. Do not forget to call this method after constructing
-        /// a new config instance.
+        /// Initialise, set up, and register your <see cref="HootModOptions"/> with Nautilus here. Do not forget to
+        /// call this method after constructing a new config instance or you won't have an in-game menu.
         /// </summary>
         /// <param name="name">The mod name displayed as a heading.</param>
-        /// <param name="separatorParent">The persistent GameObject to parent the primary separator object to.</param>
-        public abstract void RegisterModOptions(string name, Transform separatorParent);
+        /// <param name="separatorParent">The persistent GameObject to parent the primary separator object to. Can
+        /// be null, but the <see cref="HootModOptions"/> will throw an exception if you try to add a separator.</param>
+        public abstract void RegisterModOptions(string name, Transform separatorParent = null);
 
         /// <summary>
         /// Register a config entry to the config. This should be used during <see cref="RegisterOptions"/>.
@@ -66,6 +67,20 @@ namespace HootLib.Configuration
         {
             _configEntries.Add(entry);
             return entry;
+        }
+        
+        /// <inheritdoc cref="RegisterEntry{T}(HootLib.Configuration.ConfigEntryWrapper{T})"/>
+        protected ConfigEntryWrapper<T> RegisterEntry<T>(string section, string key, T defaultValue, string description)
+        {
+            var wrapper = new ConfigEntryWrapper<T>(ConfigFile, section, key, defaultValue, description);
+            return RegisterEntry(wrapper);
+        }
+        
+        /// <inheritdoc cref="RegisterEntry{T}(HootLib.Configuration.ConfigEntryWrapper{T})"/>
+        protected ConfigEntryWrapper<T> RegisterEntry<T>(string section, string key, T defaultValue, string description, AcceptableValueBase acceptableValues)
+        {
+            var wrapper = new ConfigEntryWrapper<T>(ConfigFile, section, key, defaultValue, description, acceptableValues);
+            return RegisterEntry(wrapper);
         }
 
         /// <summary>

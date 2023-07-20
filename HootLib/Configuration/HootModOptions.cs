@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Nautilus.Options;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace HootLib.Configuration
 {
@@ -17,7 +19,7 @@ namespace HootLib.Configuration
         protected readonly Transform SeparatorParent;
         protected readonly List<string> AddSeparatorBefore;
 
-        public HootModOptions(string name, HootConfig config, Transform separatorParent) : base(name)
+        public HootModOptions(string name, HootConfig config, Transform separatorParent = null) : base(name)
         {
             Config = config;
             SeparatorParent = separatorParent;
@@ -49,6 +51,8 @@ namespace HootLib.Configuration
         /// </summary>
         protected virtual void AddSeparator(uGUI_TabbedControlsPanel panel)
         {
+            if (SeparatorParent is null)
+                throw new InvalidOperationException("Cannot add a separator when no separator parent was provided!");
             _separator ??= CreateSeparator(panel, SeparatorParent);
             Object.Instantiate(_separator, _modOptionsPane, false);
         }
