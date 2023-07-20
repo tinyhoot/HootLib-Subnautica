@@ -64,6 +64,14 @@ namespace HootLib
         {
             return $"{modName.Replace(" ", string.Empty)}.cfg";
         }
+
+        /// <summary>
+        /// Get the ideal full path for the config file based on the name of the mod.
+        /// </summary>
+        public static string GetConfigFilePath(string modName)
+        {
+            return Path.Combine(BepInEx.Paths.ConfigPath, GetConfigFileName(modName));
+        }
         
         /// <summary>
         /// Get the installation directory of the mod.
