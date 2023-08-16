@@ -72,6 +72,23 @@ namespace HootLib
         {
             return Path.Combine(BepInEx.Paths.ConfigPath, GetConfigFileName(modName));
         }
+
+        /// <summary>
+        /// Get the resource stream for an asset file embedded within the dll. For this to work, the file must be
+        /// inside an "Assets" folder and marked as EmbeddedResource in its properties.
+        /// </summary>
+        /// <param name="fileName">The asset's file name.</param>
+        /// <returns>A handle on the stream pointing to the resource.</returns>
+        /// <exception cref="FileNotFoundException">If the resource cannot be found.</exception>
+        public static Stream GetEmbeddedResourceStream(string fileName)
+        {
+            // Ensure the embedded file actually exists.
+            string resourceName = GetAssetHandle(fileName, true);
+            if (!GetAssembly().GetManifestResourceNames().Any(r => r.Equals(resourceName)))
+                throw new FileNotFoundException($"Could not find embedded resource {resourceName}");
+            
+            return GetAssembly().GetManifestResourceStream(resourceName);
+        }
         
         /// <summary>
         /// Get the installation directory of the mod.
@@ -89,6 +106,24 @@ namespace HootLib
         /// <param name="value">The string to parse.</param>
         /// <returns>The parsed Enum if successful, or the Enum's default value if not.</returns>
         public static TEnum ParseEnum<TEnum>(this string value) where TEnum : Enum
+        {
+            try
+            {
+                return (TEnum)Enum.Parse(typeof(TEnum), value, true);
+            }
+            catch
+            {
+                return default;
+            }
+        }
+        
+        /// <summary>
+        /// Try parsing a string to the given type of Enum.
+        /// </summary>
+        /// <param name="type">The Type of the Enum.</param>
+        /// <param name="value">The string to parse.</param>
+        /// <returns>The parsed Enum if successful, or the Enum's default value if not.</returns>
+        public static TEnum ParseEnum<TEnum>(TEnum type, string value)
         {
             try
             {
@@ -172,13 +207,9 @@ namespace HootLib
             
             // Embedded files are a bit more difficult to deal with. Load them into memory first, then pass them
             // to the texture handlers.
-            string resourceName = GetAssetHandle(fileName, true);
-            if (!GetAssembly().GetManifestResourceNames().Any(r => r.Equals(resourceName)))
-                throw new FileNotFoundException($"Could not find embedded resource {resourceName}");
-            
+            var stream = GetEmbeddedResourceStream(fileName);
             // Things can still go wrong while reading the texture (although it shouldn't!). Catch exceptions
             // just in case so the mod as a whole won't crash.
-            var stream = GetAssembly().GetManifestResourceStream(resourceName);
             try
             {
                 var texture = new Texture2D(2, 2, TextureFormat.BC7, false);
@@ -280,6 +311,31 @@ namespace HootLib
             {
                 return null;
             }
+        }
+    }
+
+    public static class EnumerableExtensions
+    {
+        /// <summary>
+        /// Turns all elements of an enumerable into a string for easy printing. Evaluates the enumerable to completion.
+        /// </summary>
+        public static string ElementsToString(this IEnumerable enumerable)
+        {
+            string result = "";
+            foreach (var element in enumerable)
+            {
+                string elemString;
+                // Handle nested enumerables.
+                if (element.GetType() != typeof(string) && element is IEnumerable innerEnumerable)
+                    elemString = innerEnumerable.ElementsToString();
+                else
+                    elemString = element.ToString();
+                
+                if (result != "")
+                    result += "| ";
+                result += elemString;
+            }
+            return $"[{enumerable.GetType()}: {result} ]";
         }
     }
 

@@ -30,10 +30,12 @@ namespace HootLib.Configuration
             ConfigFile = new ConfigFile(path, true, metadata);
             _configEntries = new List<ConfigEntryWrapperBase>();
             _controllingOptions = new List<ConfigEntryWrapperBase>();
-            Setup();
         }
         
-        private void Setup()
+        /// <summary>
+        /// Call all abstract setup options. This is intended to be used in the constructor of your subclass.
+        /// </summary>
+        protected void Setup()
         {
             RegisterOptions();
             RegisterControllingOptions();

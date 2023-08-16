@@ -14,12 +14,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\ModOptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootModOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CsvParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HootLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ICsvParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ILogHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\HootHudBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DangerPulse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ConfigEntryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Hootils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ParsingException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Hootimer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)PostBuildEvents.targets" />
