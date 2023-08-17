@@ -17,6 +17,20 @@ namespace HootLib
     public static class Hootils
     {
         /// <summary>
+        /// Calculate a rolling average of a value over time.
+        /// </summary>
+        /// <param name="prevAverage">The average of all previous values.</param>
+        /// <param name="newVal">The new value.</param>
+        /// <param name="timeStep">The time step between each value.</param>
+        /// <param name="interval">The period of time measured by the entire average.</param>
+        /// <returns>The new average.</returns>
+        public static float AverageOverTime(float prevAverage, float newVal, float timeStep, float interval = 1f)
+        {
+            float timeMult = (interval / timeStep) - 1;
+            return (prevAverage * timeMult + newVal) / (timeMult + 1);
+        }
+        
+        /// <summary>
         /// Get the mod assembly.
         /// </summary>
         public static Assembly GetAssembly()
