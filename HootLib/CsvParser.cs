@@ -27,6 +27,15 @@ namespace HootLib
         public char Separator;
         /// This character separates list elements within a cell.
         public char ArraySeparator;
+        
+        public CsvParser(string filePath, char separator = ',', char arraySeparator = ';')
+        {
+            _blueprints = new Dictionary<Type, Blueprint>();
+            _stream = new StreamReader(filePath);
+            Header = SplitLine(_stream.ReadLine());
+            Separator = separator;
+            ArraySeparator = arraySeparator;
+        }
 
         public CsvParser(Stream fileStream, char separator = ',', char arraySeparator = ';')
         {
@@ -173,14 +182,27 @@ namespace HootLib
             }
         }
 
-        /// <inheritdoc cref="ParseAllLines{T}"/>
-        public IEnumerable<T> ParseAllLinesAsync<T>()
+        /// <summary>
+        /// Parse all lines of the file into objects of type T. Because each line runs async, the order of results is
+        /// non-deterministic. 
+        /// </summary>
+        /// <typeparam name="T">The target object type.</typeparam>
+        /// <returns>A list of instantiated objects of type T.</returns>
+        public List<T> ParseAllLinesAsync<T>()
         {
+            // We're locked to .Net 4.7.2, so there is no IAsyncEnumerable and this is the best we can do.
+            // Run each line async individually and then wait for them to sync at the end.
+            List<Task> tasks = new List<Task>();
+            List<T> results = new List<T>();
             while (!_stream.EndOfStream)
             {
-                // We're locked to .Net 4.7.2, so there is no IAsyncEnumerable and this is the best we can do.
-                yield return ParseLineAsync<T>().Result;
+                // Run the task and make it add its result to the list upon completion.
+                Task task = Task.Run(ParseLineAsync<T>).ContinueWith(t => results.Add(t.Result));
+                tasks.Add(task);
             }
+
+            Task.WaitAll(tasks.ToArray());
+            return results;
         }
 
         /// <summary>
@@ -224,6 +246,7 @@ namespace HootLib
                 if (current == separator && !openApostrophe && !openQuote)
                 {
                     cellContents.Add(line.Substring(lastSeparatorIdx, idx - lastSeparatorIdx));
+                    // Skip the comma.
                     lastSeparatorIdx = idx + 1;
                 }
                 // On the last iteration, ensure everything worked out and finish the final cell.

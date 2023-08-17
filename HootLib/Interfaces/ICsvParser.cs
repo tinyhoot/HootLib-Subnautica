@@ -9,6 +9,6 @@ namespace HootLib.Interfaces
         public T ParseLine<T>();
         public Task<T> ParseLineAsync<T>();
         public IEnumerable<T> ParseAllLines<T>();
-        public IEnumerable<T> ParseAllLinesAsync<T>();
+        public List<T> ParseAllLinesAsync<T>();
     }
 }
