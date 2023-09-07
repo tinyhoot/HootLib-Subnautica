@@ -137,16 +137,15 @@ namespace HootLib
         /// <param name="type">The Type of the Enum.</param>
         /// <param name="value">The string to parse.</param>
         /// <returns>The parsed Enum if successful, or the Enum's default value if not.</returns>
-        public static TEnum ParseEnum<TEnum>(TEnum type, string value)
+        public static object ParseEnum(Type type, string value)
         {
-            try
-            {
-                return (TEnum)Enum.Parse(typeof(TEnum), value, true);
-            }
-            catch
-            {
-                return default;
-            }
+            if (!type.IsEnum)
+                throw new ArgumentException("Type argument must be an enum!");
+
+            List<FieldInfo> fields = AccessTools.GetDeclaredFields(type);
+            var fieldValue = fields
+                .FirstOrDefault(f => f.Name.Equals(value, StringComparison.InvariantCultureIgnoreCase))?.GetValue(type);
+            return fieldValue ?? fields[0].GetValue(type);
         }
         #endregion Enums
         
