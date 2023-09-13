@@ -14,6 +14,7 @@ namespace HootLib.Configuration
     public class ConfigEntryWrapper<T> : ConfigEntryWrapperBase
     {
         public Dictionary<T, HashSet<string>> ControllingValues;
+        public HootModOptions ModOptions;
         public string[] OptionStringsOverride;
         public readonly ConfigEntry<T> Entry;
         public T Value => Entry.Value;
@@ -46,7 +47,7 @@ namespace HootLib.Configuration
         /// <summary>
         /// Prepare the entry with custom label and description for display in the mod options menu.
         /// </summary>
-        public ConfigEntryWrapper<T> WithDescription(string label, string tooltip)
+        public ConfigEntryWrapper<T> WithDescription(string label, string tooltip = null)
         {
             OptionLabel = label;
             OptionTooltip = tooltip;
@@ -111,7 +112,7 @@ namespace HootLib.Configuration
         /// of elements as the enum!
         /// </summary>
         /// <param name="newText">The text to show for each enum value, in the same order.</param>
-        public ConfigEntryWrapper<T> WithChoiceOptionStringsOverride(string[] newText)
+        public ConfigEntryWrapper<T> WithChoiceOptionStringsOverride(params string[] newText)
         {
             if (newText.Length != Enum.GetValues(typeof(T)).Length)
                 throw new ArgumentException("New choices array must be the same length as the number of number of choices!");
@@ -124,14 +125,16 @@ namespace HootLib.Configuration
         /// Prepare the entry as a controller for displaying or hiding other options in the mod options menu.
         /// This enables showing options with preconditions, such as hiding all options of a module when that module
         /// is not active.
-        ///
+        /// 
         /// Options controlled in this way will only display when the value of this entry matches their precondition.
         /// It is possible to enable an option for multiple values. Useful e.g. for ChoiceOptions.
         /// </summary>
+        /// <param name="modOptions">A reference to the mod options menu.</param>
         /// <param name="enabledValue">The value this entry must be set to to enable all the other options.</param>
         /// <param name="enabledOptions">All options shown when the value is set correctly.</param>
-        public ConfigEntryWrapper<T> WithConditionalOptions(T enabledValue, params ConfigEntryWrapperBase[] enabledOptions)
+        public ConfigEntryWrapper<T> WithConditionalOptions(HootModOptions modOptions, T enabledValue, params ConfigEntryWrapperBase[] enabledOptions)
         {
+            ModOptions = modOptions;
             ControlledOptionIds ??= new List<string>();
             ControllingValues ??= new Dictionary<T, HashSet<string>>();
             if (!ControllingValues.ContainsKey(enabledValue))
@@ -146,13 +149,14 @@ namespace HootLib.Configuration
             return this;
         }
 
-        /// <summary><inheritdoc cref="WithConditionalOptions(T,ConfigEntryWrapperBase[])"/></summary>
-        /// <param name="enabledValue"><inheritdoc cref="WithConditionalOptions(T,ConfigEntryWrapperBase[])"/></param>
+        /// <summary><inheritdoc cref="WithConditionalOptions(HootModOptions,T,ConfigEntryWrapperBase[])"/></summary>
+        /// <param name="modOptions"><inheritdoc cref="WithConditionalOptions(HootModOptions,T,ConfigEntryWrapperBase[])"/></param>
+        /// <param name="enabledValue"><inheritdoc cref="WithConditionalOptions(HootModOptions,T,ConfigEntryWrapperBase[])"/></param>
         /// <param name="section">This option will have control over this entire section.</param>
         /// <param name="config">The config containing this option.</param>
-        public ConfigEntryWrapper<T> WithConditionalOptions(T enabledValue, string section, HootConfig config)
+        public ConfigEntryWrapper<T> WithConditionalOptions(HootModOptions modOptions, T enabledValue, string section, HootConfig config)
         {
-            return WithConditionalOptions(enabledValue,
+            return WithConditionalOptions(modOptions, enabledValue,
                 config.GetSectionEntries(section)
                     .Where(entry => !entry.GetId().Equals(this.GetId()))
                     .ToArray());
@@ -162,7 +166,7 @@ namespace HootLib.Configuration
     public static class ConfigEntryWrapperExtensions
     {
         /// <inheritdoc cref="ToModToggleOption"/>
-        public static ModChoiceOption<T> ToModChoiceOption<T>(this ConfigEntryWrapper<T> wrapper, HootModOptions modOptions)
+        public static ModChoiceOption<T> ToModChoiceOption<T>(this ConfigEntryWrapper<T> wrapper)
             where T : IEquatable<T>
         {
             T[] options = null;
@@ -181,7 +185,8 @@ namespace HootLib.Configuration
             modOption.OnChanged += (_, e) => 
             {
                 wrapper.Entry.Value = e.Value;
-                wrapper.UpdateControlledOptions(modOptions.Options, modOptions.Config);
+                if (wrapper.ModOptions != null)
+                    wrapper.UpdateControlledOptions(wrapper.ModOptions.Options, wrapper.ModOptions.Config);
             };
             if (wrapper.OptionStringsOverride != null)
                 modOption.ReplaceOptionStrings(wrapper.OptionStringsOverride);
@@ -190,7 +195,7 @@ namespace HootLib.Configuration
 
         /// <inheritdoc cref="ToModToggleOption"/>
         public static ModChoiceOption<TEnum> ToModChoiceOption<TEnum>(this ConfigEntryWrapper<TEnum> wrapper,
-            HootModOptions modOptions, IEnumerable<TEnum> values = null) where TEnum : Enum
+            IEnumerable<TEnum> values = null) where TEnum : Enum
         {
             TEnum[] options = values?.ToArray() ?? (TEnum[])Enum.GetValues(typeof(TEnum));
             if (options == null)
@@ -206,7 +211,8 @@ namespace HootLib.Configuration
             modOption.OnChanged += (_, e) => 
             {
                 wrapper.Entry.Value = e.Value;
-                wrapper.UpdateControlledOptions(modOptions.Options, modOptions.Config);
+                if (wrapper.ModOptions != null)
+                    wrapper.UpdateControlledOptions(wrapper.ModOptions.Options, wrapper.ModOptions.Config);
             };
             if (wrapper.OptionStringsOverride != null)
                 modOption.ReplaceOptionStrings(wrapper.OptionStringsOverride);
@@ -269,7 +275,7 @@ namespace HootLib.Configuration
         /// <summary>
         /// Converts a wrapper for a ConfigEntry to a ModOption.
         /// </summary>
-        public static ModToggleOption ToModToggleOption(this ConfigEntryWrapper<bool> wrapper, HootModOptions modOptions)
+        public static ModToggleOption ToModToggleOption(this ConfigEntryWrapper<bool> wrapper)
         {
             var modOption = ModToggleOption.Create(
                 wrapper.GetId(),
@@ -280,7 +286,8 @@ namespace HootLib.Configuration
             modOption.OnChanged += (_, e) =>
             {
                 wrapper.Entry.Value = e.Value;
-                wrapper.UpdateControlledOptions(modOptions.Options, modOptions.Config);
+                if (wrapper.ModOptions != null)
+                    wrapper.UpdateControlledOptions(wrapper.ModOptions.Options, wrapper.ModOptions.Config);
             };
             return modOption;
         }
