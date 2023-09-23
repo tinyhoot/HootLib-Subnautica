@@ -9,12 +9,19 @@
     <Import_RootNamespace>HootLib</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssetFilePaths.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\FontSwapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\MainMenuCustomPrimaryOption.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\MainMenuCustomWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\MainMenuSpriteSwapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\ScrollBarSpriteSwapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\ConfigEntryWrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\ConfigEntryWrapperBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\ModOptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootModOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CsvParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HootLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ICsvParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ILogHandler.cs" />
