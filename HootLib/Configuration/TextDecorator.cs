@@ -24,7 +24,6 @@ namespace HootLib.Configuration
             var textObject = new GameObject("Text Label");
             textObject.transform.SetParent(panel, false);
             var textMesh = textObject.AddComponent<TextMeshProUGUI>();
-            textMesh.autoSizeTextContainer = true;
             textMesh.font = uGUI.main.intro.mainText.text.font;
             textMesh.fontSize = _fontSize;
             textMesh.fontStyle = FontStyles.Normal;
