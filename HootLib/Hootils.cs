@@ -111,6 +111,22 @@ namespace HootLib
         {
             return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName;
         }
+
+        /// <summary>
+        /// Checks whether two rotations are approximately the same.
+        /// </summary>
+        /// <param name="a">The first rotation.</param>
+        /// <param name="b">The second rotation.</param>
+        /// <param name="tolerance">A value between 0 and 1 where 0 means the rotations are exactly equal and 1 means
+        /// the rotations are as different as physically possible.</param>
+        /// <returns>True if the two rotations are approximately equal.</returns>
+        public static bool RotationsApproximately(Quaternion a, Quaternion b, float tolerance = 1e-12f)
+        {
+            // The dot product equals 1 if the two rotations are exactly the same. -1 if the rotations are the same but
+            // on opposite sides of the sphere.
+            float dotProduct = Quaternion.Dot(a, b);
+            return 1 - dotProduct <= tolerance;
+        }
         
         #region Enums
         
