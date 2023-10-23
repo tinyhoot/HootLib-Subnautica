@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using BepInEx;
+using BepInEx.Bootstrap;
 using HarmonyLib;
 using Nautilus.Assets;
 using Nautilus.Utility;
@@ -110,6 +112,17 @@ namespace HootLib
         public static string GetModDirectory()
         {
             return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName;
+        }
+
+        public static PluginInfo GetPluginInfoFromAssembly(Assembly assembly)
+        {
+            foreach (var plugin in Chainloader.PluginInfos.Values)
+            {
+                if (assembly.Location.Equals(plugin.Location))
+                    return plugin;
+            }
+
+            return null;
         }
 
         /// <summary>
