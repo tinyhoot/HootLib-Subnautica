@@ -20,9 +20,9 @@ namespace HootLib
             _log = Logger.CreateLogSource(name);
             _ingameMessages = new List<string>();
             _isReady = false;
-            // If we're not using a custom prefix just use the mod's name.
-            if (string.IsNullOrEmpty(mainMenuPrefix))
-                mainMenuPrefix = Hootils.GetPluginInfoFromAssembly(Hootils.GetAssembly()).Metadata.Name;
+            
+            if (!string.IsNullOrEmpty(mainMenuPrefix))
+                mainMenuPrefix = $"{mainMenuPrefix.Trim()} ";
             _mainMenuPrefix = mainMenuPrefix;
             // Get notified as soon as the game has loaded and is ready to display in-game messages.
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -56,7 +56,7 @@ namespace HootLib
         /// <summary>Send an in-game message to the player.</summary>
         public void InGameMessage(string message, bool error = false)
         {
-            message = $"[{_mainMenuPrefix}] {message}";
+            message = $"{_mainMenuPrefix}{message}";
             _log.LogMessage("Main Menu Message: " + message);
 
             // Colour the message a deep red if it is an error.
