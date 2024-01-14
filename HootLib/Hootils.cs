@@ -126,6 +126,27 @@ namespace HootLib
         }
 
         /// <summary>
+        /// Checks whether the given save slot contains save data associated with this mod by checking the slot for
+        /// a named subdirectory.
+        /// <br/>
+        /// Works well when used in conjunction with Nautilus' SaveDataCache.
+        /// </summary>
+        /// <param name="slotName">The internal name for the save slot. Not to be confused with session id.</param>
+        /// <param name="modName">The name of the mod directory to search for.</param>
+        public static bool HasExistingSaveData(string slotName, string modName)
+        {
+            if (PlatformUtils.main.GetUserStorage() is UserStoragePC pc)
+            {
+                string cachePath = UserStoragePC.GetSaveFilePath(pc.savePath, slotName, modName);
+                return Directory.Exists(cachePath);
+            }
+        
+            // Honestly if the user somehow got mods running on a console I'm impressed.
+            Debug.LogWarning("[HootLib] Tried to access filesystem, but user storage is not UserStoragePC!");
+            return false;
+        }
+
+        /// <summary>
         /// Checks whether two rotations are approximately the same.
         /// </summary>
         /// <param name="a">The first rotation.</param>
