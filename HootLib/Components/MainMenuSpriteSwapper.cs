@@ -15,7 +15,7 @@ namespace HootLib.Components
         {
             Image image = GetComponent<Image>();
             // Why am I even here? :(
-            if (image is null)
+            if (image == null)
                 Destroy(this);
 
             AddressablesUtility.LoadAsync<Sprite>(AssetFilePaths.MainMenuStandardSprite).Completed += handle =>

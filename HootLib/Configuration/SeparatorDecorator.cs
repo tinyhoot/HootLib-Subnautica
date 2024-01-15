@@ -23,7 +23,7 @@ namespace HootLib.Configuration
         /// and cause this mod's section in the mod options to be empty.</param>
         public SeparatorDecorator(Transform parent)
         {
-            if (parent is null)
+            if (parent == null)
                 throw new ArgumentNullException(nameof(parent), "Cannot create separator when no separator parent was provided!");
             _parent = parent;
         }
