@@ -10,8 +10,9 @@ namespace HootLib.Configuration
     /// </summary>
     public class TextDecorator : IModOptionDecorator
     {
-        private float _fontSize;
-        private string _text;
+        protected float _fontSize;
+        protected string _text;
+        protected GameObject _textObject;
 
         public TextDecorator(string text, float fontSize = 30f)
         {
@@ -19,11 +20,11 @@ namespace HootLib.Configuration
             _text = text;
         }
         
-        public void AddToPanel(Transform panel)
+        public virtual void AddToPanel(Transform panel)
         {
-            var textObject = new GameObject("Text Label");
-            textObject.transform.SetParent(panel, false);
-            var textMesh = textObject.AddComponent<TextMeshProUGUI>();
+            _textObject = new GameObject("Text Label");
+            _textObject.transform.SetParent(panel, false);
+            var textMesh = _textObject.AddComponent<TextMeshProUGUI>();
             textMesh.font = uGUI.main.intro.mainText.text.font;
             textMesh.fontSize = _fontSize;
             textMesh.fontStyle = FontStyles.Normal;
@@ -34,6 +35,20 @@ namespace HootLib.Configuration
             textMesh.verticalAlignment = VerticalAlignmentOptions.Middle;
         }
 
-        public void PrepareDecorator(uGUI_TabbedControlsPanel panel, int modsTabIndex) { }
+        public virtual void PrepareDecorator(uGUI_TabbedControlsPanel panel, int modsTabIndex) { }
+        
+        /// <summary>
+        /// Changes the text of this decorator. Also works for live updates after the mod menu has been opened.
+        /// </summary>
+        public void SetText(string text)
+        {
+            _text = text;
+            if (_textObject != null)
+            {
+                var textMesh = _textObject.GetComponent<TextMeshProUGUI>();
+                if (textMesh != null)
+                    textMesh.SetText(text);
+            }
+        }
     }
 }
