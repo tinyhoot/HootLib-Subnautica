@@ -63,7 +63,7 @@ namespace HootLib
                     result += "| ";
                 result += elemString;
             }
-            return $"[{enumerable.GetType()}: {result} ]";
+            return $"[{enumerable.GetType().Name}: {result} ]";
         }
     }
 
