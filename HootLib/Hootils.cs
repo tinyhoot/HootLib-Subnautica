@@ -61,6 +61,24 @@ namespace HootLib
         }
 
         /// <summary>
+        /// Get all types in the current assembly that have the given attribute.
+        /// </summary>
+        /// <typeparam name="T">The attribute to search for.</typeparam>
+        /// <returns>A list with all types and their attribute data. May be empty.</returns>
+        public static List<(Type, T)> GetOwnedTypesWithAttribute<T>() where T : Attribute
+        {
+            List<(Type, T)> attributes = new List<(Type, T)>();
+            foreach (Type type in GetAssembly().GetTypes())
+            {
+                var attribute = type.GetCustomAttribute<T>();
+                if (attribute != null)
+                    attributes.Add((type, attribute));
+            }
+
+            return attributes;
+        }
+
+        /// <summary>
         /// Get the full path to an asset file.
         /// </summary>
         /// <param name="fileName">The name of the file, assuming that it is directly inside the Assets folder.</param>
