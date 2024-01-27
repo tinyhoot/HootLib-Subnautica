@@ -56,7 +56,7 @@ namespace HootLib
         public static List<T> InstantiateSubclassesInAssembly<T>(Assembly assembly)
         {
             return assembly.GetTypes()
-                .Where(type => type.IsSubclassOf(typeof(T)))
+                .Where(type => type.IsSubclassOf(typeof(T)) && !type.IsAbstract)
                 .Select(type => (T)Activator.CreateInstance(type)).ToList();
         }
 
@@ -219,6 +219,14 @@ namespace HootLib
         
         #region Prefabs
 
+        /// <inheritdoc cref="CreatePrefabInfo(string,string,string,Atlas.Sprite)"/>
+        public static PrefabInfo CreatePrefabInfo(string classId, Atlas.Sprite sprite)
+        {
+            return PrefabInfo
+                .WithTechType(classId, unlockAtStart: false, techTypeOwner: GetAssembly())
+                .WithIcon(sprite);
+        }
+        
         /// <summary>
         /// Create a basic Nautilus prefabinfo with a sprite. Defaults to not unlocked at start.
         /// </summary>
