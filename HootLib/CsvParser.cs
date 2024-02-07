@@ -60,6 +60,11 @@ namespace HootLib
 
             string[] cells = SplitLine(line, Separator);
             object[] parsedCells = ParseAllCells(blueprint, cells);
+            if (blueprint.ConstructorParams.Length != parsedCells.Length)
+            {
+                throw new ParsingException($"Number of parsed cells ({parsedCells}) does not match expected"
+                                           + $"parameter count {blueprint.ConstructorParams.Length}!");
+            }
 
             return (T)blueprint.Constructor.Invoke(parsedCells);
         }
