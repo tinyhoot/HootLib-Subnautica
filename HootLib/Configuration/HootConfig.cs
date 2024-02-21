@@ -4,6 +4,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using HootLib.Objects.Exceptions;
+using Nautilus.Handlers;
 using UnityEngine;
 
 namespace HootLib.Configuration
@@ -14,6 +15,7 @@ namespace HootLib.Configuration
     public abstract class HootConfig
     {
         public ConfigFile ConfigFile { get; }
+        public HootModOptions ModOptions { get; private set; }
         private readonly List<ConfigEntryWrapperBase> _configEntries;
         private readonly List<ConfigEntryWrapperBase> _controllingOptions;
 
@@ -22,15 +24,14 @@ namespace HootLib.Configuration
             ConfigFile = configFile;
             _configEntries = new List<ConfigEntryWrapperBase>();
             _controllingOptions = new List<ConfigEntryWrapperBase>();
-            Setup();
         }
 
         /// <summary>
         /// Setting up your config file happens in three steps:
         /// <list type="bullet">
         /// <item>Instantiating a new instance (this constructor).</item>
-        /// <item>Calling <see cref="Setup"/> to register all options to the config file.</item>
-        /// <item>Calling <see cref="RegisterModOptions"/> to register all options to the in-game menu.</item>
+        /// <item>Calling <see cref="Setup"/> to register your options to the config file.</item>
+        /// <item>Calling <see cref="CreateModMenu(string,UnityEngine.Transform)"/> to register all options to the in-game menu.</item>
         /// </list>
         /// </summary>
         /// <param name="path">The path to your config file.</param>
@@ -47,11 +48,36 @@ namespace HootLib.Configuration
         /// Calls all abstract setup options to properly register all options.
         /// Safe to use in your subclass' constructor.
         /// </summary>
-        public void Setup()
+        public virtual void Setup()
         {
             RegisterOptions();
             RegisterControllingOptions();
             UpdateControllingOptionInfo();
+        }
+
+        /// <summary>
+        /// Register your in-game options with <see cref="HootModOptions"/> here. Do not forget to
+        /// call this method after constructing a new config instance or you won't have an in-game menu.
+        /// </summary>
+        /// <param name="name">The mod name displayed as a heading.</param>
+        /// <param name="persistentParent">The persistent GameObject to parent decorator object templates to. Can
+        /// be null, but <see cref="HootModOptions"/> will throw an exception if you try to add a decorator that
+        /// relies on it such as <see cref="SeparatorDecorator"/>.</param>
+        public virtual void CreateModMenu(string name, Transform persistentParent = null)
+        {
+            CreateModMenu(new HootModOptions(name, this, persistentParent));
+        }
+
+        /// <summary>
+        /// Register your in-game options with <see cref="HootModOptions"/> here. Do not forget to
+        /// call this method after constructing a new config instance or you won't have an in-game menu.
+        /// </summary>
+        /// <param name="modOptions">A preconfigured <see cref="HootModOptions"/> or subclass thereof.</param>
+        public virtual void CreateModMenu(HootModOptions modOptions)
+        {
+            ModOptions = modOptions;
+            RegisterModOptions(ModOptions);
+            OptionsPanelHandler.RegisterModOptions(ModOptions);
         }
 
         /// <summary>
@@ -67,14 +93,13 @@ namespace HootLib.Configuration
         protected abstract void RegisterControllingOptions();
 
         /// <summary>
-        /// Initialise, set up, and register your <see cref="HootModOptions"/> with Nautilus here. Do not forget to
-        /// call this method after constructing a new config instance or you won't have an in-game menu.
+        /// Register your in-game options with <see cref="HootModOptions"/> here. Do not forget to
+        /// call <see cref="CreateModMenu(string, UnityEngine.Transform)"/> after constructing a new config instance
+        /// or you won't have an in-game menu.
         /// </summary>
-        /// <param name="name">The mod name displayed as a heading.</param>
-        /// <param name="persistentParent">The persistent GameObject to parent decorator object templates to. Can
-        /// be null, but <see cref="HootModOptions"/> will throw an exception if you try to add a decorator that
-        /// relies on it such as <see cref="SeparatorDecorator"/>.</param>
-        public abstract void RegisterModOptions(string name, Transform persistentParent = null);
+        /// <param name="modOptions">The in-game menu to register your entries to.</param>
+        /// <seealso cref="HootModOptions.AddItem"/>
+        protected abstract void RegisterModOptions(HootModOptions modOptions);
 
         /// <summary>
         /// Register a config entry to the config. This should be used during <see cref="RegisterOptions"/>.
@@ -88,14 +113,14 @@ namespace HootLib.Configuration
         /// <inheritdoc cref="RegisterEntry{T}(HootLib.Configuration.ConfigEntryWrapper{T})"/>
         protected ConfigEntryWrapper<T> RegisterEntry<T>(string section, string key, T defaultValue, string description)
         {
-            var wrapper = new ConfigEntryWrapper<T>(ConfigFile, section, key, defaultValue, description);
+            var wrapper = new ConfigEntryWrapper<T>(this, section, key, defaultValue, description);
             return RegisterEntry(wrapper);
         }
         
         /// <inheritdoc cref="RegisterEntry{T}(HootLib.Configuration.ConfigEntryWrapper{T})"/>
         protected ConfigEntryWrapper<T> RegisterEntry<T>(string section, string key, T defaultValue, string description, AcceptableValueBase acceptableValues)
         {
-            var wrapper = new ConfigEntryWrapper<T>(ConfigFile, section, key, defaultValue, description, acceptableValues);
+            var wrapper = new ConfigEntryWrapper<T>(this, section, key, defaultValue, description, acceptableValues);
             return RegisterEntry(wrapper);
         }
 

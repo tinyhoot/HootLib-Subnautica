@@ -8,11 +8,17 @@ namespace HootLib.Configuration
     /// </summary>
     public abstract class ConfigEntryWrapperBase
     {
+        public readonly HootConfig Config;
         public string OptionLabel;
         public string OptionTooltip;
         public List<string> ControlledOptionIds;
         public bool IsControllingParent => ControlledOptionIds?.Count > 0;
         public int NumControllingParents = 0;
+
+        protected ConfigEntryWrapperBase(HootConfig config)
+        {
+            Config = config;
+        }
         
         public abstract string GetSection();
         public abstract string GetKey();
@@ -24,7 +30,6 @@ namespace HootLib.Configuration
         /// Set all other options' GameObjects to active/inactive state based on the value of this entry.
         /// </summary>
         /// <param name="options">The GameObjects of all options in the in-game menu.</param>
-        /// <param name="config">The config these options originate from.</param>
-        public abstract void UpdateControlledOptions(IEnumerable<OptionItem> options, HootConfig config);
+        public abstract void UpdateControlledOptions(IEnumerable<OptionItem> options);
     }
 }

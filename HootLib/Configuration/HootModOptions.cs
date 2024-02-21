@@ -15,6 +15,7 @@ namespace HootLib.Configuration
     {
         public HootConfig Config { get; }
         protected readonly Dictionary<int, IModOptionDecorator> Decorators;
+        protected readonly Transform PersistentParent;
         
         /// <summary>
         /// Invoked for every mod option that is constructed and added to the menu during <see cref="BuildModOptions"/>.
@@ -25,12 +26,36 @@ namespace HootLib.Configuration
         /// </summary>
         public event Action<AddOptionToMenuEventArgs> OnAddOptionToMenu;
 
+        /// <summary>
+        /// Create an in-game menu based on a config file. Note that if you do not provide a persistent parent transform,
+        /// using methods that add special decorators like <see cref="AddSeparator"/> will throw an exception.
+        /// </summary>
+        /// <param name="name">The name of your mod's section in the mod menu.</param>
+        /// <param name="config">The config forming the basis of this menu.</param>
         public HootModOptions(string name, HootConfig config) : base(name)
         {
             Config = config;
             Decorators = new Dictionary<int, IModOptionDecorator>();
         }
         
+        /// <inheritdoc cref="HootModOptions(string, HootConfig)"/>
+        /// <param name="persistentParent">The GameObject to parent the separator object to. This should be one which
+        /// does not get trashed by the SceneCleaner on quitting the game to the main menu, or the separator will get
+        /// deleted, cause a NullRef and result in this mod's section in the mod options to be empty.</param>
+        public HootModOptions(string name, HootConfig config, Transform persistentParent) : base(name)
+        {
+            Config = config;
+            Decorators = new Dictionary<int, IModOptionDecorator>();
+            PersistentParent = persistentParent;
+        }
+        
+        /// <summary>
+        /// Builds the in-game mod menu. This method may be called whenever the player clicks the button to open the
+        /// game's options menu, so expect it to execute multiple times.
+        /// </summary>
+        /// <param name="panel">The panel of the options window that will hold the options.</param>
+        /// <param name="modsTabIndex">The index of the tab that is responsible for mod options.</param>
+        /// <param name="options">A collection of all options that had previously been registered.</param>
         public override void BuildModOptions(uGUI_TabbedControlsPanel panel, int modsTabIndex, IReadOnlyCollection<OptionItem> options)
         {
             panel.AddHeading(modsTabIndex, Name);
@@ -70,7 +95,7 @@ namespace HootLib.Configuration
             // Ensure a newly built menu starts with the options shown or hidden correctly.
             foreach (var option in Config.GetControllingOptions())
             {
-                option.UpdateControlledOptions(options, Config);
+                option.UpdateControlledOptions(options);
             }
         }
 
@@ -87,12 +112,12 @@ namespace HootLib.Configuration
         /// <summary>
         /// A shortcut for adding a <see cref="SeparatorDecorator"/> to the mod options menu.
         /// </summary>
-        /// <param name="parent">The GameObject to parent the separator object to. This should be one which does not
-        /// get trashed by the SceneCleaner on quitting the game to the main menu, or the separator will get deleted
-        /// and cause this mod's section in the mod options to be empty.</param>
-        public void AddSeparator(Transform parent)
+        public void AddSeparator()
         {
-            AddDecorator(new SeparatorDecorator(parent));
+            if (PersistentParent == null)
+                throw new NullReferenceException($"{nameof(PersistentParent)} was not assigned, cannot create a "
+                                                 + $"separator!");
+            AddDecorator(new SeparatorDecorator(PersistentParent));
         }
 
         /// <summary>
