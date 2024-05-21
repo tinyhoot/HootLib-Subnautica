@@ -287,5 +287,23 @@ namespace HootLib.Configuration
             };
             return modOption;
         }
+        
+        public static TextInputModOption ToTextInputModOption(this ConfigEntryWrapper<string> wrapper, string placeholderText)
+        {
+            var modOption = new TextInputModOption(
+                wrapper.GetId(),
+                wrapper.GetLabel(),
+                wrapper.Value,
+                placeholderText,
+                wrapper.GetTooltip()
+            );
+            modOption.OnChanged += (_, e) =>
+            {
+                wrapper.Entry.Value = e.Value;
+                if (wrapper.Config.ModOptions != null)
+                    wrapper.UpdateControlledOptions(wrapper.Config.ModOptions.Options);
+            };
+            return modOption;
+        }
     }
 }
