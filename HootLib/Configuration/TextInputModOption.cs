@@ -15,14 +15,17 @@ namespace HootLib.Configuration
         public override Type AdjusterComponent => null;
         public string PlaceholderText;
         public string Tooltip;
+        private TMP_InputField.ContentType _contentType;
         private MenuTooltip _menuTooltip;
         private TextMeshProUGUI _textMesh;
         private AsyncOperationHandle<Sprite> _bgSpriteHandle;
 
-        public TextInputModOption(string id, string label, string value, string placeholder, string tooltip) : base(label, id, value)
+        public TextInputModOption(string id, string label, string value, string placeholder, string tooltip, 
+            TMP_InputField.ContentType contentType) : base(label, id, value)
         {
             PlaceholderText = placeholder;
             Tooltip = tooltip;
+            _contentType = contentType;
             CoroutineHost.StartCoroutine(LoadAssets());
         }
 
@@ -108,6 +111,7 @@ namespace HootLib.Configuration
             inputField.text = Value;
             inputField.textViewport = viewPort.GetComponent<RectTransform>();
             inputField.textComponent = viewPort.GetComponent<TextMeshProUGUI>();
+            inputField.contentType = _contentType;
             // This event fires when the player clicks away, closes the window, or otherwise stops editing.
             inputField.onEndEdit.AddListener(content => OnChange(Id, content));
 

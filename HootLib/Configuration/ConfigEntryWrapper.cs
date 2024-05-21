@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using BepInEx.Configuration;
 using Nautilus.Options;
+using TMPro;
 
 namespace HootLib.Configuration
 {
@@ -288,14 +289,16 @@ namespace HootLib.Configuration
             return modOption;
         }
         
-        public static TextInputModOption ToTextInputModOption(this ConfigEntryWrapper<string> wrapper, string placeholderText)
+        public static TextInputModOption ToTextInputModOption(this ConfigEntryWrapper<string> wrapper, 
+            string placeholderText, TMP_InputField.ContentType contentType)
         {
             var modOption = new TextInputModOption(
                 wrapper.GetId(),
                 wrapper.GetLabel(),
                 wrapper.Value,
                 placeholderText,
-                wrapper.GetTooltip()
+                wrapper.GetTooltip(),
+                contentType
             );
             modOption.OnChanged += (_, e) =>
             {
