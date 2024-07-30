@@ -37,6 +37,11 @@
         <Copy SourceFiles="@(Assets)" DestinationFolder="$(ModDirectory)\%(Assets.RelativeDir)"/>
     </Target>
 
+    <Target Name="CopyPdbToGameFolder" AfterTargets="Build" Condition="$(DebugSymbols) == 'true'">
+        <Message Importance="high" Text="Copying debug info files to game directory." />
+        <Copy SourceFiles="$(ProjectDir)$(OutputPath)$(TargetName).pdb" DestinationFolder="$(ModDirectory)" />
+    </Target>
+
     <!-- Find the current version of the assembly. -->
     <Target Name="GetAssemblyVersion" AfterTargets="Build" Condition="$(Configuration.Contains('Release'))">
         <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
