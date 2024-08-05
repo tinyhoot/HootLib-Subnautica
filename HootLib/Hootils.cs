@@ -96,7 +96,7 @@ namespace HootLib
         /// </summary>
         public static string GetConfigFileName(string modName)
         {
-            return $"{modName.Replace(" ", string.Empty)}.cfg";
+            return $"{GetSanitisedModName(modName)}.cfg";
         }
 
         /// <summary>
@@ -142,26 +142,33 @@ namespace HootLib
 
             return null;
         }
+        
+        /// <summary>
+        /// Get a sanitised version of the mod name that is good for e.g. file names.
+        /// </summary>
+        public static string GetSanitisedModName(string modName)
+        {
+            return modName.Replace(" ", string.Empty);
+        }
 
         /// <summary>
         /// Checks whether the given save slot contains save data associated with this mod by checking the slot for
-        /// a named subdirectory.
+        /// a named subdirectory with a specific json file.
         /// <br/>
         /// Works well when used in conjunction with Nautilus' SaveDataCache.
         /// </summary>
+        /// <param name="storage">This platform's storage backend. Gettable from <see cref="PlatformUtils"/>.</param>
         /// <param name="slotName">The internal name for the save slot. Not to be confused with session id.</param>
-        /// <param name="modName">The name of the mod directory to search for.</param>
-        public static bool HasExistingSaveData(string slotName, string modName)
+        /// <param name="modName">The name of the mod to search for.</param>
+        /// <param name="taskResult">A task result that will be set at the end of the coroutine with the result of the
+        /// operation - true if mod save data exists, false if not.</param>
+        public static IEnumerator HasExistingSaveData(UserStorage storage, string slotName, string modName, IOut<bool> taskResult)
         {
-            if (PlatformUtils.main.GetUserStorage() is UserStoragePC pc)
-            {
-                string cachePath = UserStoragePC.GetSaveFilePath(pc.savePath, slotName, modName);
-                return Directory.Exists(cachePath);
-            }
-        
-            // Honestly if the user somehow got mods running on a console I'm impressed.
-            Debug.LogWarning("[HootLib] Tried to access filesystem, but user storage is not UserStoragePC!");
-            return false;
+            string sanitisedName = GetSanitisedModName(modName);
+            string path = Path.Combine(sanitisedName, sanitisedName + ".json");
+            UserStorageUtils.LoadOperation operation = storage.LoadFilesAsync(slotName, new List<string> { path });
+            yield return operation;
+            taskResult.Set(operation.GetSuccessful());
         }
 
         /// <summary>
