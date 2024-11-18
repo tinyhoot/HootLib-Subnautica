@@ -37,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Hootils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ParsingException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Hootimer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\NautilusShell.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)PostBuildEvents.targets" />
 </Project>
