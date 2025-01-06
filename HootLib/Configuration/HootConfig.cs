@@ -5,6 +5,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using HootLib.Objects.Exceptions;
 using Nautilus.Handlers;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace HootLib.Configuration
@@ -184,6 +185,65 @@ namespace HootLib.Configuration
         public void Save()
         {
             ConfigFile.Save();
+        }
+
+        /// <summary>
+        /// Convert this config to JSON.
+        /// </summary>
+        /// <returns>The config entries in a single JSON string.</returns>
+        public string ToJson()
+        {
+            List<SerializableEntry> entries = new List<SerializableEntry>();
+            
+            // This works because Hootils backports KeyValuePair deconstructing.
+            foreach (var (definition, entry) in ConfigFile)
+            {
+                var se = new SerializableEntry(definition.Section, definition.Key, entry.GetSerializedValue());
+                entries.Add(se);
+            }
+
+            return JsonConvert.SerializeObject(entries);
+        }
+
+        /// <summary>
+        /// Attempt to populate this config with values from a JSON string.
+        /// </summary>
+        /// <param name="serializedEntries">The JSON string to decode. Expects a list of
+        /// <see cref="SerializableEntry"/>.</param>
+        public void FromJson(string serializedEntries)
+        {
+            List<SerializableEntry> entries = JsonConvert.DeserializeObject<List<SerializableEntry>>(serializedEntries);
+
+            foreach (var serialEntry in entries)
+            {
+                ConfigDefinition definition = new ConfigDefinition(serialEntry.Section, serialEntry.Key);
+                if (ConfigFile.ContainsKey(definition))
+                {
+                    // This is preferred over TryGet because this way gets around the generic type argument.
+                    ConfigEntryBase entry = ConfigFile[definition];
+                    entry.SetSerializedValue(serialEntry.Value);
+                }
+                else
+                {
+                    ErrorMessage.AddMessage($"Could not find option for entry '{serialEntry.Section}.{serialEntry.Key}'");
+                }
+            }
+        }
+
+        private class SerializableEntry
+        {
+            public string Section;
+            public string Key;
+            public string Value;
+            
+            public SerializableEntry() { }
+
+            public SerializableEntry(string section, string key, string value)
+            {
+                Section = section;
+                Key = key;
+                Value = value;
+            }
         }
     }
 }
