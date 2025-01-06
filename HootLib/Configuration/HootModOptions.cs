@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using HootLib.Interfaces;
 using Nautilus.Options;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
 namespace HootLib.Configuration
@@ -168,6 +171,123 @@ namespace HootLib.Configuration
         public static bool IsMainMenu(uGUI_TabbedControlsPanel panel)
         {
             return panel.GetComponentInParent<uGUI_MainMenu>() != null;
+        }
+
+        /// <summary>
+        /// Ensure all options displayed in the mod options menu are in sync with the values in the config file.
+        /// </summary>
+        public void Validate()
+        {
+            foreach (var option in Options)
+            {
+                Toggle toggle = option.OptionGameObject.GetComponentInChildren<Toggle>();
+                if (toggle != null)
+                {
+                    ValidateToggleOption(toggle, option.Id);
+                    continue;
+                }
+                
+                uGUI_Choice choice = option.OptionGameObject.GetComponentInChildren<uGUI_Choice>();
+                if (choice != null)
+                {
+                    ValidateChoiceOption(choice, option.Id);
+                    continue;
+                }
+
+                uGUI_SnappingSlider slider = option.OptionGameObject.GetComponentInChildren<uGUI_SnappingSlider>();
+                if (slider != null)
+                {
+                    ValidateSliderOption(slider, option.Id);
+                    continue;
+                }
+
+                TMP_InputField inputField = option.OptionGameObject.GetComponentInChildren<TMP_InputField>();
+                if (inputField != null)
+                {
+                    ValidateInputFieldOption(inputField, option.Id);
+                    continue;
+                }
+                
+                Debug.LogWarning($"Failed to find corresponding mod option type for option id '{option.Id}'");
+            }
+        }
+
+        /// <summary>
+        /// The base class of the config entry doesn't have access to the typed value, so do some magic to extract it.
+        /// </summary>
+        private object ExtractConfigValue(ConfigEntryWrapperBase wrapperBase)
+        {
+            // ConfigEntryWrapper<T> entry = wrapperBase as ConfigEntryWrapper<T>;
+            // For some insane reason casting does not work, despite the types seemingly matching perfectly.
+            // Instead, skip the wrapper and just get the value directly using reflection.
+            var propInfo = AccessTools.Property(wrapperBase.GetType(), nameof(ConfigEntryWrapper<string>.Value));
+            return propInfo.GetValue(wrapperBase);
+        }
+
+        /// <summary>
+        /// Ensure a <see cref="uGUI_Choice"/> option reflects the value as written in the config file.
+        /// </summary>
+        private void ValidateChoiceOption(uGUI_Choice choice, string id)
+        {
+            var entry = Config.GetEntryById(id);
+            Type type = entry.GetType().GetGenericArguments()[0];
+            object value = ExtractConfigValue(entry);
+            
+            // Try to set the value for enum-based choices.
+            if (type.IsEnum || typeof(int).IsAssignableFrom(type))
+            {
+                choice.value = (int)value;
+            }
+            else
+            {
+                // Handle string-based choices.
+                int idx = choice.options.IndexOf(value.ToString());
+                choice.value = idx;
+            }
+        }
+
+        /// <summary>
+        /// Ensure a <see cref="TMP_InputField"/> option reflects the value as written in the config file.
+        /// </summary>
+        private void ValidateInputFieldOption(TMP_InputField inputField, string id)
+        {
+            var entry = Config.GetEntryById(id);
+            object value = ExtractConfigValue(entry);
+            inputField.text = value.ToString();
+        }
+
+        /// <summary>
+        /// Ensure a <see cref="uGUI_SnappingSlider"/> option reflects the value as written in the config file.
+        /// </summary>
+        private void ValidateSliderOption(uGUI_SnappingSlider slider, string id)
+        {
+            var entry = Config.GetEntryById(id);
+            object value = ExtractConfigValue(entry);
+            // You cannot cast directly from object to float so sadly this is necessary.
+            switch (value)
+            {
+                case int i:
+                    slider.Set(i);
+                    return;
+                case float f:
+                    slider.Set(f);
+                    return;
+                case double d:
+                    slider.Set((float)d);
+                    return;
+                default:
+                    ErrorMessage.AddMessage($"Failed to import value '{value}' for option '{id}'.");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Ensure a <see cref="Toggle"/> option reflects the value as written in the config file.
+        /// </summary>
+        private void ValidateToggleOption(Toggle toggle, string id)
+        {
+            var entry = (ConfigEntryWrapper<bool>)Config.GetEntryById(id);
+            toggle.isOn = entry.Value;
         }
     }
 
