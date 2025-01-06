@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\HootModOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\SeparatorDecorator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\TextDecorator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Configuration\TextInputDecorator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Configuration\TextInputModOption.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CsvParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
