@@ -349,6 +349,19 @@ namespace HootLib
             Color.RGBToHSV(newColor, out float replacementHue, out _, out _);
             return Color.HSVToRGB(replacementHue, s, v).WithAlpha(oldColor.a);
         }
+        #endregion Sprites and Textures
+        
+        #region Misc
+        
+        /// <summary>
+        /// This is a backport from .Net Core 2.0. It allows for easier handling of KeyValuePairs, like iterating
+        /// over a dictionary and getting the keys/values directly.
+        /// </summary>
+        public static void Deconstruct<T1, T2>(this KeyValuePair<T1, T2> kvpair, out T1 key, out T2 value)
+        {
+            key = kvpair.Key;
+            value = kvpair.Value;
+        }
         
         /// <summary>
         /// Wrap a try-catch block around a coroutine to more easily catch exceptions that happen inside.
@@ -373,6 +386,6 @@ namespace HootLib
                 yield return current;
             }
         }
-        #endregion Sprites and Textures
+        #endregion Misc
     }
 }
