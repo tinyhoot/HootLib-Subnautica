@@ -32,7 +32,7 @@ namespace HootLib
         {
             _blueprints = new Dictionary<Type, Blueprint>();
             _stream = new StreamReader(filePath);
-            Header = SplitLine(_stream.ReadLine());
+            Header = Split(_stream.ReadLine());
             Separator = separator;
             ArraySeparator = arraySeparator;
         }
@@ -41,7 +41,7 @@ namespace HootLib
         {
             _blueprints = new Dictionary<Type, Blueprint>();
             _stream = new StreamReader(fileStream);
-            Header = SplitLine(_stream.ReadLine());
+            Header = Split(_stream.ReadLine());
             Separator = separator;
             ArraySeparator = arraySeparator;
         }
@@ -58,7 +58,7 @@ namespace HootLib
                 _blueprints.Add(typeof(T), blueprint);
             }
 
-            string[] cells = SplitLine(line, Separator);
+            string[] cells = Split(line, Separator);
             object[] parsedCells = ParseAllCells(blueprint, cells);
             if (blueprint.ConstructorParams.Length != parsedCells.Length)
             {
@@ -114,12 +114,15 @@ namespace HootLib
         /// </summary>
         protected virtual object ParseCell(Type type, string cell)
         {
+            if (type == typeof(string) && !type.IsAssignableFrom(typeof(IEnumerable<string>)))
+                return cell;
+            
             // Handle enumerables with recursion.
-            if (type != typeof(string) && type.IsAssignableFrom(typeof(IEnumerable)))
+            if (typeof(IEnumerable).IsAssignableFrom(type))
             {
                 Type innerType = type.GetElementType();
-                string[] array = SplitLine(cell, ArraySeparator);
-                return array.Select(elem => ParseCell(innerType, elem));
+                string[] array = Split(cell, ArraySeparator);
+                return array.Select(elem => ParseCell(innerType, elem)).ToList();
             }
             
             // Try to handle enums first.
@@ -193,20 +196,17 @@ namespace HootLib
         /// </summary>
         /// <typeparam name="T">The target object type.</typeparam>
         /// <returns>A list of instantiated objects of type T.</returns>
-        public List<T> ParseAllLinesAsync<T>()
+        public async Task<List<T>> ParseAllLinesAsync<T>()
         {
             // We're locked to .Net 4.7.2, so there is no IAsyncEnumerable and this is the best we can do.
             // Run each line async individually and then wait for them to sync at the end.
-            List<Task> tasks = new List<Task>();
             List<T> results = new List<T>();
             while (!_stream.EndOfStream)
             {
-                // Run the task and make it add its result to the list upon completion.
-                Task task = Task.Run(ParseLineAsync<T>).ContinueWith(t => results.Add(t.Result));
-                tasks.Add(task);
+                T line = await ParseLineAsync<T>();
+                results.Add(line);
             }
 
-            Task.WaitAll(tasks.ToArray());
             return results;
         }
 
@@ -216,7 +216,7 @@ namespace HootLib
         /// <param name="line">A line from the csv file.</param>
         /// <param name="separator">The separator to split cells on.</param>
         /// <returns>An array of the separated cell contents.</returns>
-        protected string[] SplitLine(string line, char separator = ',')
+        public static string[] Split(string line, char separator = ',')
         {
             int lastSeparatorIdx = 0;
             bool openApostrophe = false;
@@ -250,8 +250,8 @@ namespace HootLib
                 // Found a cell separator! Store the contents of the just-passed cell.
                 if (current == separator && !openApostrophe && !openQuote)
                 {
-                    cellContents.Add(line.Substring(lastSeparatorIdx, idx - lastSeparatorIdx));
-                    // Skip the comma.
+                    cellContents.Add(TrimSubstring(line, lastSeparatorIdx, idx - lastSeparatorIdx, separator));
+                    // Skip the separator.
                     lastSeparatorIdx = idx + 1;
                 }
                 // On the last iteration, ensure everything worked out and finish the final cell.
@@ -259,11 +259,16 @@ namespace HootLib
                 {
                     if (openApostrophe || openQuote)
                         throw new ParsingException("Malformed line ended with unclosed quote: " + line);
-                    cellContents.Add(line.Substring(lastSeparatorIdx, idx - lastSeparatorIdx + 1));
+                    cellContents.Add(TrimSubstring(line, lastSeparatorIdx, line.Length - lastSeparatorIdx, separator));
                 }
             }
 
             return cellContents.Select(c => c.Trim()).ToArray();
+        }
+
+        private static string TrimSubstring(string source, int startIndex, int length, char separator)
+        {
+            return source.Substring(startIndex, length).Trim(' ', '"', '\'', separator);
         }
 
         public void Dispose()
