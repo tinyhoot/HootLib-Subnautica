@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib.Interfaces;
 using HootLib.Objects.Exceptions;
+using UnityEngine;
 
 namespace HootLib
 {
@@ -130,14 +131,18 @@ namespace HootLib
                 return Hootils.ParseEnum(type, cell);
 
             // Not exactly elegant but typeof() cannot be used here since it is not a constant.
-            return type.Name.ToLower() switch
+            object parsed = type.Name.ToLower() switch
             {
                 "double" => double.Parse(cell, Culture),
                 "float" => float.Parse(cell, Culture),
-                "int" => int.Parse(cell, Culture),
+                "int32" => int.Parse(cell, Culture),
                 "single" => float.Parse(cell, Culture),
-                _ => cell // Use original string as a fallback.
+                _ => null
             };
+            
+            if (parsed is null)
+                Debug.LogError($"{nameof(CsvParser)} failed to parse '{cell}' to {type}");
+            return parsed;
         }
 
         /// <summary>
