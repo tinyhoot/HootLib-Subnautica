@@ -94,6 +94,7 @@ namespace HootLib
             int[] paramMapping = new int[paramInfo.Length];
             for (int idx = 0; idx < paramMapping.Length; idx++)
             {
+                // paramMapping[idx] = Array.IndexOf(Header, paramInfo[idx].Name);
                 paramMapping[idx] = Header.IndexOf(paramInfo[idx].Name, StringComparer.InvariantCultureIgnoreCase);
             }
 
@@ -150,15 +151,16 @@ namespace HootLib
         /// </summary>
         /// <param name="blueprint">The blueprint to follow during instantiation.</param>
         /// <param name="cells">All cells of the current line.</param>
-        /// <returns>An array of instantiated objects corresponding to the cells, in the same order.</returns>
+        /// <returns>An array of instantiated objects corresponding to the cells, in blueprint constructor order.</returns>
         protected virtual object[] ParseAllCells(Blueprint blueprint, string[] cells)
         {
             object[] parsedCells = new object[cells.Length];
 
             for (int idx = 0; idx < cells.Length; idx++)
             {
-                Type type = blueprint.ConstructorParams[idx];
-                parsedCells[idx] = ParseCell(type, cells[idx]);
+                int mappedIdx = blueprint.ParamMapping[idx];
+                Type type = blueprint.ConstructorParams[mappedIdx];
+                parsedCells[mappedIdx] = ParseCell(type, cells[idx]);
             }
 
             return parsedCells;
