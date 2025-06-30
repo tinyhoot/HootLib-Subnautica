@@ -17,25 +17,33 @@ namespace HootLib.Components
     {
         public Button.ButtonClickedEvent onClick;
         [NonSerialized]
-        public GameObject CustomOption;
-        [NonSerialized]
         public TextMeshProUGUI Text;
+        [NonSerialized]
+        public DynamicLiveTranslation DynamicTranslation;
         
         private void Awake()
         {
-            onClick ??= new Button.ButtonClickedEvent();
-            
-            Transform optionsContainer = uGUI_MainMenu.main.primaryOptions.transform.Find("PrimaryOptions/MenuButtons");
-            // Create a new option by cloning the Play button.
-            CustomOption = Instantiate(optionsContainer.GetChild(0).gameObject, optionsContainer, false);
-            CustomOption.name = "HootOption";
-            Text = CustomOption.GetComponentInChildren<TextMeshProUGUI>();
-            SetText("Custom Option");
-            // Prevent the button text from being unintentionally overwritten.
-            DestroyImmediate(Text.GetComponent<TranslationLiveUpdate>());
             // Replace the button's onClick event with our custom one.
-            Button button = CustomOption.GetComponent<Button>();
+            onClick ??= new Button.ButtonClickedEvent();
+            Button button = gameObject.GetComponent<Button>();
             button.onClick = onClick;
+        }
+
+        public static MainMenuCustomPrimaryOption Create(string name, string languageKey = null)
+        {
+            Transform optionsContainer = uGUI_MainMenu.main.primaryOptions.transform.Find("PrimaryOptions/MenuButtons");
+            
+            // Create a new option by cloning the Play button.
+            var gameObject = Instantiate(optionsContainer.GetChild(0).gameObject, optionsContainer, false);
+            gameObject.name = name;
+            var customOption = gameObject.AddComponent<MainMenuCustomPrimaryOption>();
+            customOption.Text = gameObject.GetComponentInChildren<TextMeshProUGUI>();
+            
+            // Add language keys for easy localisation.
+            customOption.SetText(name);
+            customOption.DynamicTranslation = customOption.Text.AddDynamicTranslation(languageKey);
+
+            return customOption;
         }
 
         /// <summary>
@@ -46,16 +54,25 @@ namespace HootLib.Components
         /// <param name="index"></param>
         public void SetIndex(int index)
         {
-            CustomOption.transform.SetSiblingIndex(index);
+            transform.SetSiblingIndex(index);
         }
 
         /// <summary>
-        /// Set the text displayed by this custom option. Take care not to use this before this component has had a
-        /// chance to run <see cref="Awake"/> or you will get an exception.
+        /// Set the text displayed by this custom option. This will get overwritten if a language key has been set.
         /// </summary>
+        /// <seealso cref="SetLanguageKey"/>
         public void SetText(string text)
         {
+            if (!Text)
+                return;
+            
             Text.text = text;
+        }
+
+        /// <inheritdoc cref="DynamicLiveTranslation.SetLanguageKey(string)"/>
+        public void SetLanguageKey(string key)
+        {
+            DynamicTranslation.SetLanguageKey(key);
         }
     }
 }

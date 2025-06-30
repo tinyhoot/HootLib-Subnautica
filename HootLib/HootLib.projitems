@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssetFilePaths.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\DynamicLiveTranslation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\FontSwapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\MainMenuCustomPrimaryOption.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\MainMenuCustomWindow.cs" />
