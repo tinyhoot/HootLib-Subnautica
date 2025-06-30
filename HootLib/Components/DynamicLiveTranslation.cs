@@ -27,6 +27,9 @@ namespace HootLib.Components
             
             if (!text)
                 text = GetComponent<TextMeshProUGUI>();
+            
+            // Ensure the text has been set at least once.
+            OnLanguageChanged();
         }
 
         private void OnEnable()
