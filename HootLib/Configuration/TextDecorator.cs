@@ -1,3 +1,5 @@
+using System;
+using HootLib.Components;
 using HootLib.Interfaces;
 using TMPro;
 using UnityEngine;
@@ -12,9 +14,11 @@ namespace HootLib.Configuration
     {
         protected float _fontSize;
         protected string _text;
+        protected Func<object>[] _callbacks;
         protected GameObject _textObject;
+        protected DynamicLiveTranslation _localiser;
 
-        public TextDecorator(string text, float fontSize = 30f)
+        public TextDecorator(string text, float fontSize = 30f, params Func<object>[] textCallbacks)
         {
             _fontSize = fontSize;
             _text = text;
@@ -31,8 +35,11 @@ namespace HootLib.Configuration
             textMesh.enableWordWrapping = true;
             textMesh.overflowMode = TextOverflowModes.Overflow;
             textMesh.material = uGUI.main.intro.mainText.text.material;
-            textMesh.text = _text;
             textMesh.verticalAlignment = VerticalAlignmentOptions.Middle;
+
+            _localiser = _textObject.AddComponent<DynamicLiveTranslation>();
+            _localiser.SetFormatArgCallbacks(_callbacks);
+            _localiser.SetLanguageKey(_text);
         }
 
         public virtual void PrepareDecorator(uGUI_TabbedControlsPanel panel, int modsTabIndex) { }
@@ -40,15 +47,23 @@ namespace HootLib.Configuration
         /// <summary>
         /// Changes the text of this decorator. Also works for live updates after the mod menu has been opened.
         /// </summary>
-        public void SetText(string text)
+        public virtual void SetText(string text, params Func<object>[] callbacks)
         {
             _text = text;
-            if (_textObject != null)
+            if (_localiser != null)
             {
-                var textMesh = _textObject.GetComponent<TextMeshProUGUI>();
-                if (textMesh != null)
-                    textMesh.SetText(text);
+                _localiser.SetFormatArgCallbacks(callbacks);
+                _localiser.SetLanguageKey(text);
             }
+        }
+
+        /// <summary>
+        /// Update the displayed text by calling the callbacks provided via <see cref="SetText"/>.
+        /// </summary>
+        public virtual void UpdateText()
+        {
+            if (_localiser)
+                _localiser.OnLanguageChanged();
         }
     }
 }
