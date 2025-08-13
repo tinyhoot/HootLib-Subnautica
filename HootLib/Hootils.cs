@@ -104,7 +104,7 @@ namespace HootLib
         /// </summary>
         public static string GetConfigFilePath(string modName)
         {
-            return Path.Combine(BepInEx.Paths.ConfigPath, GetConfigFileName(modName));
+            return Path.Combine(Paths.ConfigPath, GetConfigFileName(modName));
         }
 
         /// <summary>
@@ -226,8 +226,8 @@ namespace HootLib
         
         #region Prefabs
 
-        /// <inheritdoc cref="CreatePrefabInfo(string,string,string,Atlas.Sprite)"/>
-        public static PrefabInfo CreatePrefabInfo(string classId, Atlas.Sprite sprite)
+        /// <inheritdoc cref="CreatePrefabInfo(string,string,string,Sprite)"/>
+        public static PrefabInfo CreatePrefabInfo(string classId, Sprite sprite)
         {
             return PrefabInfo
                 .WithTechType(classId, unlockAtStart: false, techTypeOwner: GetAssembly())
@@ -238,7 +238,7 @@ namespace HootLib
         /// Create a basic Nautilus prefabinfo with a sprite. Defaults to not unlocked at start.
         /// </summary>
         public static PrefabInfo CreatePrefabInfo(string classId, string displayName, string description,
-            Atlas.Sprite sprite)
+            Sprite sprite)
         {
             return PrefabInfo
                 .WithTechType(classId, displayName, description, unlockAtStart: false, techTypeOwner: GetAssembly())
@@ -296,7 +296,7 @@ namespace HootLib
         /// <param name="fileName">The name of the file, assuming that it is directly inside the Assets folder.</param>
         /// <param name="isEmbedded">Whether the file is shipped separately or embedded into the assembly as a
         /// resource.</param>
-        public static Atlas.Sprite LoadSprite(string fileName, bool isEmbedded = false)
+        public static Sprite LoadSprite(string fileName, bool isEmbedded = false)
         {
             if (!isEmbedded)
                 return ImageUtils.LoadSpriteFromFile(GetAssetHandle(fileName));
