@@ -3,8 +3,9 @@
     <!-- Defining the file names of project-specific data we'll load later. -->
     <PropertyGroup>
         <AssetTargetsFile>Assets.targets</AssetTargetsFile>
+        <AssetTargetsFullPath>$(MSBuildProjectDirectory)\$(AssetTargetsFile)</AssetTargetsFullPath>
         <GameDirTargetsFile>GameDirectory.targets</GameDirTargetsFile>
-        <GameDirTargetsFullPath>$(ProjectDir)$(GameDirTargetsFile)</GameDirTargetsFullPath>
+        <GameDirTargetsFullPath>$(MSBuildProjectDirectory)\$(GameDirTargetsFile)</GameDirTargetsFullPath>
     </PropertyGroup>
 
     <!-- Ensure the user (you!) has actually set everything up properly. -->
@@ -17,7 +18,7 @@
     </Target>
     
     <!-- Import extra information from project-specific files. -->
-    <Import Project="$(ProjectDir)$(AssetTargetsFile)" Condition="Exists('$(ProjectDir)$(AssetTargetsFile)')"/>
+    <Import Project="$(AssetTargetsFullPath)" Condition="Exists('$(AssetTargetsFullPath)')"/>
     <!-- Import the location of the game directory. -->
     <Import Project="$(GameDirTargetsFullPath)" Condition="Exists('$(GameDirTargetsFullPath)')"/>
     <PropertyGroup>
@@ -37,13 +38,14 @@
         <Copy SourceFiles="@(Assets)" DestinationFolder="$(ModDirectory)\%(Assets.RelativeDir)"/>
     </Target>
 
-    <Target Name="CopyPdbToGameFolder" AfterTargets="Build" Condition="$(DebugSymbols) == 'true'">
+    <!-- Copy the .pdb file to the game directory if it exists. -->
+    <Target Name="CopyPdbToGameFolder" AfterTargets="Build" Condition="$(DebugSymbols) == 'true' and Exists('$(GameDirectory)')">
         <Message Importance="high" Text="Copying debug info files to game directory." />
-        <Copy SourceFiles="$(ProjectDir)$(OutputPath)$(TargetName).pdb" DestinationFolder="$(ModDirectory)" />
+        <Copy SourceFiles="$(MSBuildProjectDirectory)\$(OutputPath)$(TargetName).pdb" DestinationFolder="$(ModDirectory)" />
     </Target>
 
     <!-- Find the current version of the assembly. -->
-    <Target Name="GetAssemblyVersion" AfterTargets="Build" Condition="$(Configuration.Contains('Release'))">
+    <Target Name="GetAssemblyVersionFromBuild" AfterTargets="Build" Condition="$(Configuration.Contains('Release'))">
         <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
             <Output TaskParameter="Assemblies" ItemName="AssemblyIdentity" />
         </GetAssemblyIdentity>
@@ -54,7 +56,7 @@
     </Target>
 
     <!-- Automatically create the zip file, ready for distribution. -->
-    <Target Name="PrepareZip" AfterTargets="Build" Condition="$(Configuration.Contains('Release'))">
+    <Target Name="PrepareZip" AfterTargets="GetAssemblyVersionFromBuild" Condition="$(Configuration.Contains('Release'))">
         <Message Importance="normal" Text="Copying files to temporary directory." />
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TempZipDir)\$(ZipStructure)" />
         <Copy SourceFiles="@(Assets)" DestinationFolder="$(TempZipDir)\$(ZipStructure)\%(Assets.RelativeDir)" />
@@ -66,7 +68,7 @@
         </PropertyGroup>
         <ZipDirectory DestinationFile="$(ZipFile)" SourceDirectory="$(TempZipDir)" Overwrite="true" />
     </Target>
-    <Target Name="Cleanup" AfterTargets="CreateZip" Condition="'$(Configuration)' == 'Release'">
+    <Target Name="Cleanup" AfterTargets="CreateZip" Condition="$(Configuration.Contains('Release'))">
         <Message Importance="normal" Text="Cleaning up." />
         <RemoveDir Directories="$(TempZipDir)" />
     </Target>
