@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Exceptions\ParsingException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Hootimer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\NautilusShell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RushedCoroutine.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)PostBuildEvents.targets" />
 </Project>
